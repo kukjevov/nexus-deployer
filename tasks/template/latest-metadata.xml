@@ -10,13 +10,13 @@
         <snapshotVersions>
             <snapshotVersion>
                 <extension><%= packaging %></extension>
-                <value><%= fileVersion %></value>
+                <value><%= timestampVersion %></value>
                 <updated><%= lastUpdated %></updated>
             </snapshotVersion>
 
             <snapshotVersion>
                 <extension>pom</extension>
-                <value><%= fileVersion %></value>
+                <value><%= timestampVersion %></value>
                 <updated><%= lastUpdated %></updated>
             </snapshotVersion>
         </snapshotVersions>

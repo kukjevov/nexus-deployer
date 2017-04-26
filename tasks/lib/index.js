@@ -61,6 +61,7 @@ var createAndUploadArtifacts = function (options, done) {
         fs.mkdirSync(pomDir);
     }
 
+    options.timestampVersion = options.version.replace("SNAPSHOT", options.lastUpdated.replace(/(\d{8})(\d{6})/, "$1.$2")) + "-1";
 
     save(createFile('project-metadata.xml', options), pomDir, 'outer.xml');
     save(createFile('latest-metadata.xml', options), pomDir, 'inner.xml');
@@ -155,7 +156,7 @@ var createAndUploadArtifacts = function (options, done) {
             uploads[pomDir + "/inner.xml.md5"] = groupArtifactVersionPath + '/' + 'maven-metadata.xml.md5';
         }
 
-        var remoteArtifactName = options.artifactId + '-' + options.fileVersion;
+        var remoteArtifactName = options.artifactId + '-' + (SNAPSHOT_VER.test(options.version) ? options.timestampVersion : options.version);
         uploads[pomDir + "/pom.xml"] = groupArtifactVersionPath + '/' + remoteArtifactName + '.pom';
         uploads[pomDir + "/pom.xml.sha1"] = groupArtifactVersionPath + '/' + remoteArtifactName + '.pom.sha1';
         uploads[pomDir + "/pom.xml.md5"] = groupArtifactVersionPath + '/' + remoteArtifactName + '.pom.md5';

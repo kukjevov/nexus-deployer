@@ -8,6 +8,7 @@ var fs = require("fs");
 var chalk = require('chalk');
 var path = require('path');
 var mkdirp = require('mkdirp');
+var request = require('request');
 
 var exec;
 
@@ -73,43 +74,42 @@ var createAndUploadArtifacts = function (options, done) {
                 console.log(chalk.blue('Uploading to ' + targetUri + "\n\n"));
             }
 
-            var curlOptions = [
-                '--silent',
-                '--output', '/dev/stderr',
-                '--write-out', '"%{http_code}"',
-                '--upload-file', fileLocation,
-                '--noproxy', options.noproxy ? options.noproxy : '127.0.0.1'
-            ];
+            var requestOptions = {};
 
-            if (options.auth) {
-                curlOptions.push('-u');
-                curlOptions.push('"'+options.auth.username + ":" + options.auth.password+'"');
+            if (!options.auth) {
+                console.log(chalk.red('You must provide authentication info!'));
+
+                cb("Missing authentication!", null);
             }
 
             if (options.insecure) {
-                curlOptions.push('--insecure');
+                //TODO
+                // curlOptions.push('--insecure');
             }
 
-            var execOptions = {};
-            options.cwd && (execOptions.cwd = options.cwd);
-
-            var curlCmd = ['curl', curlOptions.join(' '), targetUri].join(' ');
-
-            var childProcess = exec(curlCmd, execOptions, function (error) {
-                if (error) {
-                    console.log(chalk.red(error));
-                }
-            });
-            childProcess.stdout.on('data', function (data) {
-                status = data;
-            });
-            childProcess.on('close', function (code) {
-                if ((status && status.substring(0, 1) == "2") || code == 0) {
-                    cb(null, "Ok");
-                } else  {
-                    cb("Status code " + status + " for " + targetUri, null);
-                }
-            });
+            fs.createReadStream(fileLocation)
+                .pipe(request.put(targetUri)
+                        .auth(options.auth.username, options.auth.password)
+                        .on('response', function(response) 
+                        {
+                            if(response.statusCode == 200 || response.statusCode == 201)
+                            {
+                                console.log(chalk.green(response.statusMessage));
+                                console.log(chalk.green(response.statusCode));
+                                cb(null, "Ok");
+                            }
+                            else
+                            {
+                                console.log(chalk.red(response.statusMessage));
+                                console.log(chalk.red(response.statusCode));
+                                cb("Error during request for " + targetUri, null);
+                            }
+                        })
+                        .on('error', function(error) 
+                        {
+                            console.log(chalk.red(error));
+                            cb("Error during request for " + targetUri, null);
+                        }));
         };
         return uploadArtifact;
     };

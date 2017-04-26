@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata>
+<metadata modelVersion="1.1.0">
     <groupId><%= groupId %></groupId>
     <artifactId><%= artifactId %></artifactId>
     <version><%= version %></version>
+
     <versioning>
         <lastUpdated><%= lastUpdated %></lastUpdated>
+
+        <snapshotVersions>
+            <snapshotVersion>
+                <extension><%= packaging %></extension>
+                <value><%= fileVersion %></value>
+                <updated><%= lastUpdated %></updated>
+            </snapshotVersion>
+
+            <snapshotVersion>
+                <extension>pom</extension>
+                <value><%= fileVersion %></value>
+                <updated><%= lastUpdated %></updated>
+            </snapshotVersion>
+        </snapshotVersions>
     </versioning>
 </metadata>

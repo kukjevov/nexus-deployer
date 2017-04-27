@@ -55,13 +55,22 @@ var directoryExists = function(dir) {
 
 var createAndUploadArtifacts = function (options, done) {
     var pomDir = options.pomDir || 'test/poms';
+    var buildNumber = 1;
+    var extractBuildNumberRegex = /SNAPSHOT\.(\d+)/;
+
+    if(extractBuildNumberRegex.test(options.version))
+    {
+        var matches = extractBuildNumberRegex.exec(options.version);
+        buildNumber = +matches[1];
+        options.version = options.version.replace(extractBuildNumberRegex, "SNAPSHOT");
+    }
 
     options.parallel = options.parallel === undefined ? false : options.parallel;
     if (!directoryExists(pomDir)) {
         fs.mkdirSync(pomDir);
     }
 
-    options.timestampVersion = options.version.replace("SNAPSHOT", options.lastUpdated.replace(/(\d{8})(\d{6})/, "$1.$2")) + "-1";
+    options.timestampVersion = options.version.replace("SNAPSHOT", options.lastUpdated.replace(/(\d{8})(\d{6})/, "$1.$2")) + "-" + buildNumber;
 
     save(createFile('project-metadata.xml', options), pomDir, 'outer.xml');
     save(createFile('latest-metadata.xml', options), pomDir, 'inner.xml');

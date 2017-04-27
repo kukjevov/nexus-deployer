@@ -57,6 +57,14 @@ var createAndUploadArtifacts = function (options, done) {
     var pomDir = options.pomDir || 'test/poms';
     var buildNumber = 1;
     var extractBuildNumberRegex = /SNAPSHOT\.(\d+)/;
+    var extractSnapshotBuildNumberRegex = /SNAPSHOT-(\d+)(?:\.\d+)?/;
+
+    if(extractSnapshotBuildNumberRegex.test(options.version))
+    {
+        var matches = extractSnapshotBuildNumberRegex.exec(options.version);
+        buildNumber = +matches[1];
+        options.version = options.version.replace(extractSnapshotBuildNumberRegex, "SNAPSHOT");
+    }
 
     if(extractBuildNumberRegex.test(options.version))
     {

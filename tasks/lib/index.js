@@ -58,22 +58,29 @@ var createAndUploadArtifacts = function (options, done) {
     var buildNumber = 1;
     var extractBuildNumberRegex = /SNAPSHOT\.(\d+)/;
     var extractSnapshotBuildNumberRegex = /SNAPSHOT-(\d+)(?:\.\d+)?/;
+    var extractSnapshotPrefixRegex = /(?:-(.*))(-SNAPSHOT-.*$)/gi;
+    var matches;
 
-    if(extractSnapshotBuildNumberRegex.test(options.version))
+    if((matches = extractSnapshotPrefixRegex.exec(options.version)))
     {
-        var matches = extractSnapshotBuildNumberRegex.exec(options.version);
+        var prefix = matches[1];
+        options.version = prefix + "-" + options.version.replace(extractSnapshotPrefixRegex, "$2");
+    }
+
+    if((matches = extractSnapshotBuildNumberRegex.exec(options.version)))
+    {
         buildNumber = +matches[1];
         options.version = options.version.replace(extractSnapshotBuildNumberRegex, "SNAPSHOT");
     }
 
-    if(extractBuildNumberRegex.test(options.version))
+    if((matches = extractBuildNumberRegex.exec(options.version)))
     {
-        var matches = extractBuildNumberRegex.exec(options.version);
         buildNumber = +matches[1];
         options.version = options.version.replace(extractBuildNumberRegex, "SNAPSHOT");
     }
 
     options.parallel = options.parallel === undefined ? false : options.parallel;
+
     if (!directoryExists(pomDir)) {
         fs.mkdirSync(pomDir);
     }

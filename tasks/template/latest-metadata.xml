@@ -5,17 +5,24 @@
     <version><%= version %></version>
 
     <versioning>
+        <% if (isSnapshot) { %>
+        <snapshot>
+            <timestamp><%= timestamp %></timestamp>
+            <buildNumber><%= buildNumber %></buildNumber>
+        </snapshot>
+        <% } %>
+
         <lastUpdated><%= lastUpdated %></lastUpdated>
 
         <snapshotVersions>
             <snapshotVersion>
-                <extension><%= packaging %></extension>
+                <extension>pom</extension>
                 <value><%= timestampVersion %></value>
                 <updated><%= lastUpdated %></updated>
             </snapshotVersion>
 
             <snapshotVersion>
-                <extension>pom</extension>
+                <extension><%= packaging %></extension>
                 <value><%= timestampVersion %></value>
                 <updated><%= lastUpdated %></updated>
             </snapshotVersion>

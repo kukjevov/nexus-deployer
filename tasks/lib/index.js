@@ -85,7 +85,10 @@ var createAndUploadArtifacts = function (options, done) {
         fs.mkdirSync(pomDir);
     }
 
-    options.timestampVersion = options.version.replace("SNAPSHOT", options.lastUpdated.replace(/(\d{8})(\d{6})/, "$1.$2")) + "-" + buildNumber;
+    options.timestamp = options.lastUpdated.replace(/(\d{8})(\d{6})/, "$1.$2");
+    options.buildNumber = buildNumber;
+    options.isSnapshot = options.version.indexOf("SNAPSHOT") > -1;
+    options.timestampVersion = options.version.replace("SNAPSHOT", options.timestamp) + "-" + buildNumber;
 
     save(createFile('project-metadata.xml', options), pomDir, 'outer.xml');
     save(createFile('latest-metadata.xml', options), pomDir, 'inner.xml');
